@@ -16,8 +16,8 @@ import kodlama.io.Universty.webApi.model.responses.teacher.GetAllTeacherResponse
 import kodlama.io.Universty.webApi.model.responses.teacher.GetByIdTeacherResponse;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TeacherManager implements TeacherService {
@@ -39,21 +39,23 @@ public class TeacherManager implements TeacherService {
             .map(
                 teacher ->
                     new GetAllTeacherResponse(
-                        teacher.getId(), teacher.getName(), teacher.getBranch()))
+                        teacher.getId(), teacher.getFirstName(),teacher.getLastName(), teacher.getBranch()))
             .toList(),
         "ÖĞRETMENLER BAŞARIYLA LİSTELENDİ !");
   }
 
   @Override
-  public DataResult<GetByIdTeacherResponse> getById(int id) {
+  public DataResult<GetByIdTeacherResponse> getById(int id) throws Exception {
 
     GetByIdTeacherResponse getByIdTeacherResponse = new GetByIdTeacherResponse();
     Teacher teacher =
         teacherRepository
             .findById(id)
             .orElseThrow(
-                () -> new RuntimeException("SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
-    getByIdTeacherResponse.setName(teacher.getName());
+                () ->
+                    new BusinessException("SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
+    getByIdTeacherResponse.setFirstname(teacher.getFirstName());
+    getByIdTeacherResponse.setLastName(teacher.getLastName());
     getByIdTeacherResponse.setBranchName(teacher.getBranch().getName());
     return new SuccessDataResult<>(getByIdTeacherResponse, id + " NUMARALI VERİ GETİRİLDİ.");
   }
@@ -61,36 +63,54 @@ public class TeacherManager implements TeacherService {
   @Override
   public Result add(TeacherAddRequest teacherAddRequest) throws Exception {
 
-    isNameExist(teacherAddRequest.getName());
-    isIdExist(teacherAddRequest.getBranchId());
+    if (!this.branchService.isBranchExists(teacherAddRequest.getBranchId())) {
+      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
+    }
+    if (existsByFirstNameIgnoreCaseAndBranch_Id(
+        teacherAddRequest.getFirstName(), teacherAddRequest.getBranchId())) {
+      throw new BusinessException("EKLEMEK İSTEDİĞİNİZ ÖĞRETMEN BU BRANŞTA ZATEN TANIMLI ! ");
+    }
 
     Teacher teacher = new Teacher();
-    teacher.setName(teacherAddRequest.getName());
-    Branch branch = this.branchService.getBranchById(teacherAddRequest.getBranchId());
-    teacher.setBranch(branch);
+    teacher.setFirstName(teacherAddRequest.getFirstName());
+    teacher.setLastName(teacherAddRequest.getLastName());
+    teacher.setGender(teacherAddRequest.getGender());
+    teacher.setEmail(teacherAddRequest.getEmail());
+    teacher.setPassword(teacherAddRequest.getPassword());
+    teacher.setAge(teacherAddRequest.getAge());
+    teacher.setBiography(teacherAddRequest.getBiography());
+    teacher.setSalary(teacherAddRequest.getSalary());
+    teacher.setTitle(teacherAddRequest.getTitle());
+    teacher.setUserName(teacherAddRequest.getUserName());
 
+    Branch branch = this.branchService.getBranchById(teacherAddRequest.getBranchId());
+    if (Objects.nonNull(teacher)) {
+      teacher.setBranch(branch);
+    }
     teacherRepository.save(teacher);
 
-    return new SuccessResult(teacherAddRequest.getName() + " BAŞARIYLA SİSTEME EKLENDİ ! ");
+    return new SuccessResult(teacherAddRequest.getFirstName() +" "+ teacherAddRequest.getLastName() + " BAŞARIYLA SİSTEME EKLENDİ ! ");
   }
 
   @Override
   public Result update(int id, TeacherUpdateRequest teacherUpdateRequest) throws Exception {
 
-    isIdExist(id);
-    isIdExist(teacherUpdateRequest.getBranchId());
-    isNameExist(teacherUpdateRequest.getName());
+    if (!existsById(id)){
+      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
+    }
+
+    if (existsByName(teacherUpdateRequest.getFirstName())){
+      throw new BusinessException("GÜNCELLEMEK İSTEDİĞİNİZ ÖĞRETMEN BU BRANŞTA ZATEN TANIMLI ! ");
+    }
 
     Teacher teacher =
         teacherRepository
             .findById(id)
             .orElseThrow(
                 () ->
-                    new EntityNotFoundException(
-                        "SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
-    teacher.setName(teacherUpdateRequest.getName());
-    Branch branch = this.branchService.getBranchById(teacherUpdateRequest.getBranchId());
-    teacher.setBranch(branch);
+                    new BusinessException("SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
+    teacher.setFirstName(teacherUpdateRequest.getFirstName());
+    teacher.setLastName(teacherUpdateRequest.getLastName());
 
     teacherRepository.save(teacher);
 
@@ -100,26 +120,23 @@ public class TeacherManager implements TeacherService {
   @Override
   public Result delete(int id) throws Exception {
 
-    isIdExist(id);
+    if (!existsById(id)){
+      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
+    }
 
     teacherRepository.deleteById(id);
     return new SuccessResult("SİLME İŞLEMİ BAŞARILI !");
   }
 
-  public void isNameExist(String name) throws Exception {
-    for (Teacher teacher : teacherRepository.findAll()) {
-      if (teacher.getName().equalsIgnoreCase(name)) {
-
-        throw new BusinessException("Sistemde aynı isimde öğretmen zaten tanımlı ! ");
-      }
-    }
+  public boolean existsByName(String name) {
+    return teacherRepository.existsByFirstName(name);
   }
 
-  public void isIdExist(int id) throws Exception {
-    for (Teacher teacher : teacherRepository.findAll()) {
-      if (teacher.getId() != id) {
-        throw new BusinessException("Sistemde bu ID ile tanımlı öğretmen bulunamadı ! ");
-      }
-    }
+  public boolean existsById(int id) {
+    return teacherRepository.existsById(id);
+  }
+
+  boolean existsByFirstNameIgnoreCaseAndBranch_Id(String name, int id) {
+    return teacherRepository.existsByFirstNameIgnoreCaseAndBranch_Id(name, id);
   }
 }

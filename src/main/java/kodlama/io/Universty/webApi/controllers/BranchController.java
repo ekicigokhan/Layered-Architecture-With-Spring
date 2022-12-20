@@ -31,7 +31,7 @@ public class BranchController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<DataResult> getById(@PathVariable int id) {
+  public ResponseEntity<DataResult> getById(@PathVariable int id) throws Exception {
 
     DataResult<GetByIdBranchResponse> branchServicegetById = branchService.getById(id);
     return new ResponseEntity<>(branchServicegetById, HttpStatus.OK);

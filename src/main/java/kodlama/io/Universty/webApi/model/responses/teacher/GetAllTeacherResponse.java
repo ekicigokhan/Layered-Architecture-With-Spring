@@ -17,7 +17,8 @@ import java.util.List;
 public class GetAllTeacherResponse {
 
     private int id;
-    private String name;
+    private String firstName;
+    private String lastName;
     private Branch branch;
 
 }

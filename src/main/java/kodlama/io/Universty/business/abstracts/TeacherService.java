@@ -13,7 +13,7 @@ public interface TeacherService {
 
   DataResult<List<GetAllTeacherResponse>> getAll();
 
-  DataResult<GetByIdTeacherResponse> getById(int id);
+  DataResult<GetByIdTeacherResponse> getById(int id) throws Exception;
 
   Result add(TeacherAddRequest teacherAddRequest) throws Exception;
 

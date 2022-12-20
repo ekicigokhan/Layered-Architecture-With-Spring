@@ -1,8 +1,8 @@
 package kodlama.io.Universty.webApi.controllers;
 
 import kodlama.io.Universty.business.abstracts.TeacherService;
-import kodlama.io.Universty.core.utilities.results.*;
-import kodlama.io.Universty.entities.concretes.Teacher;
+import kodlama.io.Universty.core.utilities.results.DataResult;
+import kodlama.io.Universty.core.utilities.results.Result;
 import kodlama.io.Universty.webApi.model.requests.teacher.TeacherAddRequest;
 import kodlama.io.Universty.webApi.model.requests.teacher.TeacherUpdateRequest;
 import kodlama.io.Universty.webApi.model.responses.teacher.GetAllTeacherResponse;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,10 +34,10 @@ public class TeacherController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<DataResult> getById(@PathVariable int id) {
+  public ResponseEntity<DataResult> getById(@PathVariable int id) throws Exception {
 
-    DataResult<GetByIdTeacherResponse> teacherServiceById = teacherService.getById(id);
-    return new ResponseEntity<>(teacherServiceById, HttpStatus.OK);
+    DataResult<GetByIdTeacherResponse> teacherServiceGetById = teacherService.getById(id);
+    return new ResponseEntity<>(teacherServiceGetById, HttpStatus.OK);
   }
 
   @PostMapping("/add")

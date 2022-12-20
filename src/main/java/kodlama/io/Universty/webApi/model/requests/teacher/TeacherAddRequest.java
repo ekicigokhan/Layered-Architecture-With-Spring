@@ -12,5 +12,14 @@ import lombok.Setter;
 public class TeacherAddRequest {
 
     private int branchId;
-    private String name;
+    private String firstName;
+    private String lastName;
+    private int age;
+    private String biography;
+    private String title;
+    private int salary;
+    private String userName;
+    private String password;
+    private String gender;
+    private String email;
 }

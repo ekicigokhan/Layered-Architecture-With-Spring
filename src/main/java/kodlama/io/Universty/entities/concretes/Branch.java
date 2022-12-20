@@ -23,9 +23,9 @@ public class Branch {
   @Column(name = "branch_id")
   private int id;
 
-  @Column(name = "branch_name", length = 50, nullable = false)
+  @Column(name = "branch_name")
   private String name;
 
-  @OneToMany(mappedBy = "branch")
+  @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
   private List<Teacher> teachers;
 }

@@ -13,7 +13,7 @@ public class BusinessExceptionHandler {
 
     @ExceptionHandler(value = {BusinessException.class})
     public ResponseEntity<Result> handleBussinessException(BusinessException businessException){
-        ErrorResult errorResult = new ErrorResult(businessException.getLocalizedMessage());
+    ErrorResult errorResult = new ErrorResult(businessException.getLocalizedMessage());
 
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }

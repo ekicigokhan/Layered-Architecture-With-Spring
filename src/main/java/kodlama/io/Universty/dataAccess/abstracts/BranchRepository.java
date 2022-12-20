@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface BranchRepository extends JpaRepository<Branch, Integer> {
 
   boolean existsByName(String name);
+
+  boolean existsById(int id);
+
 }

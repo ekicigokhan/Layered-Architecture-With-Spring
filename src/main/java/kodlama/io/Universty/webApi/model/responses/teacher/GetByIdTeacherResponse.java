@@ -12,7 +12,8 @@ import lombok.Setter;
 @Setter
 public class GetByIdTeacherResponse {
 
-    private String name;
+    private String firstname;
+    private String lastName;
     private String branchName;
 
 }

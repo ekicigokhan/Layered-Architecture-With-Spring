@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 public class TeacherUpdateRequest {
 
-    private int branchId;
-    private String name;
+    private String firstName;
+    private String lastName;
 }
