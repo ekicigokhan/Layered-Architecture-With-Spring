@@ -11,16 +11,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/teachers")
-public class TeacherController {
+public class TeacherControllers {
 
   private TeacherService teacherService;
 
-  public TeacherController(TeacherService teacherService) {
+  public TeacherControllers(TeacherService teacherService) {
 
     this.teacherService = teacherService;
   }
@@ -41,7 +41,7 @@ public class TeacherController {
   }
 
   @PostMapping("/add")
-  public ResponseEntity<Result> add(@RequestBody TeacherAddRequest teacherAddRequest)
+  public ResponseEntity<Result> add(@Valid @RequestBody TeacherAddRequest teacherAddRequest)
       throws Exception {
 
     Result teacherServiceAddResult = teacherService.add(teacherAddRequest);
@@ -50,7 +50,7 @@ public class TeacherController {
 
   @PutMapping("/{id}")
   public ResponseEntity<Result> update(
-      @PathVariable int id, @RequestBody TeacherUpdateRequest teacherUpdateRequest)
+          @PathVariable int id, @Valid@RequestBody TeacherUpdateRequest teacherUpdateRequest)
       throws Exception {
 
     Result teacherServiceUpdateResult = teacherService.update(id, teacherUpdateRequest);

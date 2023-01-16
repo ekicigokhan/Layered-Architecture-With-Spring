@@ -13,15 +13,12 @@ import java.util.List;
 public interface BranchService {
 
     DataResult<List<GetAllBranchResponse>> getAll();
-
     DataResult<GetByIdBranchResponse> getById(int id) throws Exception;
     Result add(BranchAddRequest branchAddRequest) throws Exception;
     Result update(int id, BranchUpdateRequest branchUpdateRequest)throws Exception;
     Result delete(int id)throws Exception;
-
     Branch getBranchById (int id);
-
-    boolean isBranchExists(int id);
+    void isBranchExists(int id);
 
 
 

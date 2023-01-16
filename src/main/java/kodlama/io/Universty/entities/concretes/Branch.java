@@ -1,20 +1,18 @@
 package kodlama.io.Universty.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
-@Table(name = "branches")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
+@Table(name = "branches")
+@Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "teachers"})
 public class Branch {
 
@@ -26,6 +24,11 @@ public class Branch {
   @Column(name = "branch_name")
   private String name;
 
-  @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)
+  @OneToMany(
+      mappedBy = "branch",
+      cascade =
+          CascadeType
+              .ALL) // EAGER : VERİTABANINDAN BRANŞ HER SELECT EDİLDİĞİNİZDE ONUN İLGİLİ TEACHER'IDA
+  // GELSİN.
   private List<Teacher> teachers;
 }

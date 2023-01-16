@@ -1,11 +1,10 @@
 package kodlama.io.Universty.entities.concretes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -17,13 +16,13 @@ import java.time.LocalDate;
 @Table(name = "students")
 public class Student extends User {
   @Column(name = "student_no")
-  private int stundentNo;
+  private int studentNo;
 
   @Column(name = "nationality")
   private String nationality;
 
-  @Column(name = "nationality_id")
-  private String nationalityId;
+  @Column(name = "national_Identity")
+  private String nationalIdentity;
 
   @Column(name = "birthday")
   private LocalDate birthday;
@@ -31,4 +30,26 @@ public class Student extends User {
   @ManyToOne
   @JoinColumn(name = "department_id")
   private Department department;
+
+  @Builder
+  public Student(
+      int id,
+      String firstName,
+      String lastName,
+      String email,
+      String userName,
+      String password,
+      String gender,
+      int studentNo,
+      String nationality,
+      String nationalIdentity,
+      LocalDate birthday,
+      Department department) {
+    super(id, firstName, lastName, email, userName, password, gender);
+    this.studentNo = studentNo;
+    this.nationality = nationality;
+    this.nationalIdentity = nationalIdentity;
+    this.birthday = birthday;
+    this.department = department;
+  }
 }

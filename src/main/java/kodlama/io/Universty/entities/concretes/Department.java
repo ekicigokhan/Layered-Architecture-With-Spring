@@ -1,11 +1,9 @@
 package kodlama.io.Universty.entities.concretes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @AllArgsConstructor
@@ -14,6 +12,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "departments")
+@Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "students"})
 public class Department {
 
   @Id
@@ -27,6 +27,6 @@ public class Department {
   @Column(name = "description")
   private String description;
 
-  @OneToMany(mappedBy = "department")
+  @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
   private List<Student> students;
 }

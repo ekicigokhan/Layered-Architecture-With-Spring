@@ -1,40 +1,49 @@
-package kodlama.io.Universty.webApi.model.requests.teacher;
+package kodlama.io.Universty.webApi.model.requests.student;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.constraints.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
+import java.time.LocalDate;
+
 @Getter
 @Setter
-public class TeacherUpdateRequest {
-
-    @Positive
-    private int branchId;
-
-    @NotNull
-    private String firstName;
+@NoArgsConstructor
+@AllArgsConstructor
+public class StudentUpdateRequest {
 
     @NotNull
-    private String lastName;
-
-    @Positive
-    @Min(22)@Max(55)
-    private int age;
-
-    @NotNull
-    private String biography;
+    private int departmentId;
 
     @NotNull
     @NotBlank
-    private String title;
+    private String firstName;
 
+    @NotNull
+    @NotBlank
+    private String lastName;
+
+    @NotNull
+    @NotBlank
     @Positive
-    private double salary;
+    private int studentNo;
+
+    @NotNull
+    @NotBlank
+    private String nationality;
+
+    @NotNull
+    @NotBlank
+    private String nationalIdentity;
+
+    @NotNull
+    @NotBlank
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private LocalDate birthday;
 
     @NotNull
     @NotBlank

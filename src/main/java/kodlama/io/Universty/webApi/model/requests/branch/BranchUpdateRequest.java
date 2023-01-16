@@ -5,11 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import jakarta.validation.constraints.*;
+
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class BranchUpdateRequest {
 
-    private String newBranchName;
+
+    @NotNull
+    @NotBlank
+    private String name;
 }

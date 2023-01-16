@@ -1,11 +1,8 @@
 package kodlama.io.Universty.entities.concretes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,4 +28,5 @@ public class User {
     private String password;
     @Column(name = "gender")
     private String gender;
+
 }

@@ -1,18 +1,12 @@
 package kodlama.io.Universty.webApi.model.responses.branch;
 
-import kodlama.io.Universty.entities.concretes.Branch;
-import kodlama.io.Universty.entities.concretes.Teacher;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.List;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class GetByIdBranchResponse {
 
     private String branchName;

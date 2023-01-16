@@ -1,6 +1,7 @@
 package kodlama.io.Universty.business.concretes;
 
 import kodlama.io.Universty.business.abstracts.BranchService;
+import kodlama.io.Universty.business.constants.Messages;
 import kodlama.io.Universty.core.utilities.customExceptions.BusinessException;
 import kodlama.io.Universty.core.utilities.results.DataResult;
 import kodlama.io.Universty.core.utilities.results.Result;
@@ -12,12 +13,14 @@ import kodlama.io.Universty.webApi.model.requests.branch.BranchAddRequest;
 import kodlama.io.Universty.webApi.model.requests.branch.BranchUpdateRequest;
 import kodlama.io.Universty.webApi.model.responses.branch.GetAllBranchResponse;
 import kodlama.io.Universty.webApi.model.responses.branch.GetByIdBranchResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
+@Slf4j
 public class BranchManager implements BranchService {
 
   private BranchRepository branchRepository;
@@ -29,71 +32,64 @@ public class BranchManager implements BranchService {
   @Override
   public DataResult<List<GetAllBranchResponse>> getAll() {
 
-    List<GetAllBranchResponse> branchResponses =
-        branchRepository.findAll().stream()
-            .map(branch -> new GetAllBranchResponse(branch.getId(), branch.getName()))
-            .toList();
-    return new SuccessDataResult<>(branchResponses, "BRANŞLAR BAŞARIYLA LİSTELENDİ ! ");
+    List<Branch> branches = branchRepository.findAll();
+    List<GetAllBranchResponse> getAllBranchResponseList = new ArrayList<>();
+    for (Branch inDbBranch : branches) {
+      GetAllBranchResponse getAllBranchResponse =
+          buildGetAllBranchResponseFromBranch(inDbBranch);
+      getAllBranchResponseList.add(getAllBranchResponse);
+    }
+
+    return new SuccessDataResult<>(
+        getAllBranchResponseList, Messages.GetListMessages.BRANCHES_LISTED);
   }
 
   @Override
   public DataResult<GetByIdBranchResponse> getById(int id) throws Exception {
-
-    GetByIdBranchResponse getByIdBranchResponse = new GetByIdBranchResponse();
-    Branch branch =
+    Branch inDbBranch =
         branchRepository
             .findById(id)
-            .orElseThrow(
-                () -> new BusinessException("SİSTEMDE BU ID İLE KAYITLI BRANŞ BULUNAMADI."));
-    getByIdBranchResponse.setBranchName(branch.getName());
-
+            .orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
+    GetByIdBranchResponse getByIdBranchResponse =
+        buildGetByIdBranchResponseFromBranch(inDbBranch);
     return new SuccessDataResult<>(
-        getByIdBranchResponse,
-        "SİSTEMDE " + id + " NOLU ID İLE TANIMLANMIŞ BRANŞ BAŞARIYLA GETİRİLDİ ! ");
+        getByIdBranchResponse, Messages.GetByIdMessages.BRANCH_BROUGHT_SUCCESSFULLY);
   }
 
   @Override
   public Result add(BranchAddRequest branchAddRequest) throws Exception {
 
-    if (existsByName(branchAddRequest.getName())) {
-      throw new BusinessException("EKLEMEK İSTEDİĞİNİZ BRANŞ ZATEN MEVCUT !");
-    }
-
-    Branch branch = new Branch();
-    branch.setName(branchAddRequest.getName());
-
+    existsByBranchName(branchAddRequest.getName());
+    Branch branch = buildBranchAddRequestToBranch(branchAddRequest);
     branchRepository.save(branch);
-    return new SuccessResult(branchAddRequest.getName() + " İSİMLİ BRANŞ BAŞARIYLA EKLENDİ.");
+    log.info("added {} ", branchAddRequest.getName());
+    return new SuccessResult(Messages.AddMessages.BRANCH_ADDED + branchAddRequest.getName());
   }
 
   @Override
   public Result update(int id, BranchUpdateRequest branchUpdateRequest) throws Exception {
 
-    if (!existsById(id) || existsByName(branchUpdateRequest.getNewBranchName())) {
-      throw new BusinessException(
-          "GÜNCELLEMEK İSTEDİĞİNİZ ID MEVCUT DEĞİL VEYA AYNI İSİMDE BRANŞ ZATEN TANIMLANMIŞ !");
-    }
-
-    Branch branch = branchRepository.findById(id).get();
-    branch.setName(branchUpdateRequest.getNewBranchName());
-
+    isBranchExists(id);
+    existsByBranchName(branchUpdateRequest.getName());
+    Branch inDbBranch = branchRepository.findById(id).get();
+    Branch branch = buildBranchUpdateRequestToBranch(branchUpdateRequest);
+    branch.setId(inDbBranch.getId());
     branchRepository.save(branch);
 
     return new SuccessResult(
-        branchUpdateRequest.getNewBranchName() + " İSİMLİ DERS GÜNCELLEMESİ BAŞARILI !");
+        Messages.UpdateMessages.BRANCH_UPDATED + " " + branchUpdateRequest.getName());
   }
 
   @Override
   public Result delete(int id) throws Exception {
 
-    if (!existsById(id)) {
-      throw new BusinessException("SİLMEK İSTEDİĞİNİZ ID MEVCUT DEĞİL !");
-    }
-    Branch branch = branchRepository.findById(id).get();
+    Branch branch =
+        branchRepository
+            .findById(id)
+            .orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
     branchRepository.deleteById(id);
 
-
-    return new SuccessResult(id + " NUMARALI ID SİLİNDİ. SİLİNEN BRANŞ: "+ branch.getName() );
+    return new SuccessResult(Messages.DeleteMessages.BRANCH_DELETED + " " + branch.getName());
   }
 
   @Override
@@ -101,20 +97,48 @@ public class BranchManager implements BranchService {
 
     return branchRepository
         .findById(id)
-        .orElseThrow(() -> new BusinessException("BU ID İLE TANIMLI BRANŞ BULUNAMADI !"));
+        .orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
   }
 
   @Override
-  public boolean isBranchExists(int id) {
-    return existsById(id);
+  public void isBranchExists(int id) {
+    if (!branchRepository.existsById(id)) {
+      throw new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND);
+    }
   }
 
-
-  public boolean existsById(int id) {
-    return branchRepository.existsById(id);
+  private void existsByBranchName(String name) {
+    if (branchRepository.existsByName(name)) {
+      throw new BusinessException(Messages.ErrorMessages.BRANCH_NAME_DUPLICATED);
+    }
   }
 
-  public boolean existsByName(String name) {
-    return branchRepository.existsByName(name);
+  private static GetAllBranchResponse buildGetAllBranchResponseFromBranch(
+          Branch inDbBranch) {
+    return GetAllBranchResponse.builder()
+        .branchId(inDbBranch.getId())
+        .branchName(inDbBranch.getName())
+        .build();
+  }
+
+  private static GetByIdBranchResponse buildGetByIdBranchResponseFromBranch(
+          Branch inDbBranch) {
+    return GetByIdBranchResponse.builder()
+            .branchName(inDbBranch.getName())
+            .build();
+  }
+
+  private static Branch buildBranchAddRequestToBranch(
+          BranchAddRequest branchAddRequest) {
+    return Branch.builder()
+            .name(branchAddRequest.getName())
+            .build();
+  }
+
+  private static Branch buildBranchUpdateRequestToBranch(
+          BranchUpdateRequest branchUpdateRequest) {
+    return Branch.builder()
+            .name(branchUpdateRequest.getName())
+            .build();
   }
 }

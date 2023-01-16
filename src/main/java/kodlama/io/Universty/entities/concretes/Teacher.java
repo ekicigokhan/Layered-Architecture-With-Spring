@@ -1,11 +1,10 @@
 package kodlama.io.Universty.entities.concretes;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import kodlama.io.Universty.webApi.model.responses.teacher.GetByIdTeacherResponse;
+import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
 
 @Table(name = "teachers")
 @NoArgsConstructor
@@ -30,4 +29,26 @@ public class Teacher extends User {
   @ManyToOne()
   @JoinColumn(name = "branch_id")
   private Branch branch;
+
+  @Builder
+  public Teacher(
+      int id,
+      String firstName,
+      String lastName,
+      String email,
+      String userName,
+      String password,
+      String gender,
+      int age,
+      double salary,
+      String biography,
+      String title,
+      Branch branch) {
+    super(id, firstName, lastName, email, userName, password, gender);
+    this.age = age;
+    this.salary = salary;
+    this.biography = biography;
+    this.title = title;
+    this.branch = branch;
+  }
 }

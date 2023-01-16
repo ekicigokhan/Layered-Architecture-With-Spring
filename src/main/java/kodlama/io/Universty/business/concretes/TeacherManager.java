@@ -2,6 +2,7 @@ package kodlama.io.Universty.business.concretes;
 
 import kodlama.io.Universty.business.abstracts.BranchService;
 import kodlama.io.Universty.business.abstracts.TeacherService;
+import kodlama.io.Universty.business.constants.Messages;
 import kodlama.io.Universty.core.utilities.customExceptions.BusinessException;
 import kodlama.io.Universty.core.utilities.results.DataResult;
 import kodlama.io.Universty.core.utilities.results.Result;
@@ -16,8 +17,8 @@ import kodlama.io.Universty.webApi.model.responses.teacher.GetAllTeacherResponse
 import kodlama.io.Universty.webApi.model.responses.teacher.GetByIdTeacherResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class TeacherManager implements TeacherService {
@@ -34,109 +35,157 @@ public class TeacherManager implements TeacherService {
   @Override
   public DataResult<List<GetAllTeacherResponse>> getAll() {
 
-    return new SuccessDataResult<>(
-        teacherRepository.findAll().stream()
-            .map(
-                teacher ->
-                    new GetAllTeacherResponse(
-                        teacher.getId(), teacher.getFirstName(),teacher.getLastName(), teacher.getBranch()))
-            .toList(),
-        "ÖĞRETMENLER BAŞARIYLA LİSTELENDİ !");
+    List<Teacher> teachers = teacherRepository.findAll();
+    List<GetAllTeacherResponse> teacherResponseList = new ArrayList<>();
+    for (Teacher inDbTeacher : teachers) {
+      GetAllTeacherResponse getAllTeacherResponse =
+          buildGetAllTeacherResponseFromTeacher(inDbTeacher);
+      teacherResponseList.add(getAllTeacherResponse);
+    }
+    return new SuccessDataResult<>(teacherResponseList, Messages.GetListMessages.TEACHERS_LISTED);
   }
 
   @Override
   public DataResult<GetByIdTeacherResponse> getById(int id) throws Exception {
 
-    GetByIdTeacherResponse getByIdTeacherResponse = new GetByIdTeacherResponse();
-    Teacher teacher =
+    Teacher inDbTeacher =
         teacherRepository
             .findById(id)
-            .orElseThrow(
-                () ->
-                    new BusinessException("SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
-    getByIdTeacherResponse.setFirstname(teacher.getFirstName());
-    getByIdTeacherResponse.setLastName(teacher.getLastName());
-    getByIdTeacherResponse.setBranchName(teacher.getBranch().getName());
-    return new SuccessDataResult<>(getByIdTeacherResponse, id + " NUMARALI VERİ GETİRİLDİ.");
+            .orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
+    GetByIdTeacherResponse getByIdTeacherResponse =
+        buildGetByIdTeacherResponseFromTeacher(inDbTeacher);
+    return new SuccessDataResult<>(
+        getByIdTeacherResponse,
+        Messages.GetByIdMessages.TEACHER_BROUGHT_SUCCESSFULLY
+            + " "
+            + getByIdTeacherResponse.getFirstName()
+            + " "
+            + getByIdTeacherResponse.getLastName());
   }
 
   @Override
   public Result add(TeacherAddRequest teacherAddRequest) throws Exception {
 
-    if (!this.branchService.isBranchExists(teacherAddRequest.getBranchId())) {
-      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
-    }
-    if (existsByFirstNameIgnoreCaseAndBranch_Id(
-        teacherAddRequest.getFirstName(), teacherAddRequest.getBranchId())) {
-      throw new BusinessException("EKLEMEK İSTEDİĞİNİZ ÖĞRETMEN BU BRANŞTA ZATEN TANIMLI ! ");
-    }
-
-    Teacher teacher = new Teacher();
-    teacher.setFirstName(teacherAddRequest.getFirstName());
-    teacher.setLastName(teacherAddRequest.getLastName());
-    teacher.setGender(teacherAddRequest.getGender());
-    teacher.setEmail(teacherAddRequest.getEmail());
-    teacher.setPassword(teacherAddRequest.getPassword());
-    teacher.setAge(teacherAddRequest.getAge());
-    teacher.setBiography(teacherAddRequest.getBiography());
-    teacher.setSalary(teacherAddRequest.getSalary());
-    teacher.setTitle(teacherAddRequest.getTitle());
-    teacher.setUserName(teacherAddRequest.getUserName());
-
-    Branch branch = this.branchService.getBranchById(teacherAddRequest.getBranchId());
-    if (Objects.nonNull(teacher)) {
-      teacher.setBranch(branch);
-    }
+    branchService.isBranchExists(teacherAddRequest.getBranchId());
+    existsByFirstNameAndLastNameIgnoreCaseAndBranch_Id(
+        teacherAddRequest.getFirstName(),
+        teacherAddRequest.getLastName(),
+        teacherAddRequest.getBranchId());
+    Branch branch = branchService.getBranchById(teacherAddRequest.getBranchId());
+    Teacher teacher = buildTeacherAddRequestToTeacher(teacherAddRequest);
+    teacher.setBranch(branch);
     teacherRepository.save(teacher);
-
-    return new SuccessResult(teacherAddRequest.getFirstName() +" "+ teacherAddRequest.getLastName() + " BAŞARIYLA SİSTEME EKLENDİ ! ");
+    return new SuccessResult(
+        Messages.AddMessages.TEACHER_ADDED
+            + " "
+            + teacherAddRequest.getFirstName()
+            + " "
+            + teacherAddRequest.getLastName());
   }
 
   @Override
   public Result update(int id, TeacherUpdateRequest teacherUpdateRequest) throws Exception {
 
-    if (!existsById(id)){
-      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
-    }
-
-    if (existsByName(teacherUpdateRequest.getFirstName())){
-      throw new BusinessException("GÜNCELLEMEK İSTEDİĞİNİZ ÖĞRETMEN BU BRANŞTA ZATEN TANIMLI ! ");
-    }
-
-    Teacher teacher =
+    Teacher inDbTeacher =
         teacherRepository
             .findById(id)
-            .orElseThrow(
-                () ->
-                    new BusinessException("SİSTEMDE BU ID İLE TANIMLANMIŞ ÖĞRETMEN BULUNAMADI.."));
-    teacher.setFirstName(teacherUpdateRequest.getFirstName());
-    teacher.setLastName(teacherUpdateRequest.getLastName());
-
+            .orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
+    Branch branch = branchService.getBranchById(teacherUpdateRequest.getBranchId());
+    Teacher teacher = buildTeacherUpdateRequestToTeacher(teacherUpdateRequest);
+    teacher.setId(inDbTeacher.getId());
+    teacher.setBranch(branch);
     teacherRepository.save(teacher);
-
-    return new SuccessResult("BAŞARIYLA GÜNCELLENDİ !");
+    return new SuccessResult(Messages.UpdateMessages.TEACHER_UPDATED);
   }
 
   @Override
   public Result delete(int id) throws Exception {
 
-    if (!existsById(id)){
-      throw new BusinessException("BU ID İLE TANIMLI ÖĞRETMEN BULUNAMADI !");
-    }
-
+    isTeacherExists(id);
+    Teacher teacher = teacherRepository.findById(id).get();
     teacherRepository.deleteById(id);
-    return new SuccessResult("SİLME İŞLEMİ BAŞARILI !");
+    return new SuccessResult(
+        Messages.DeleteMessages.TEACHER_DELETED
+            + " "
+            + teacher.getFirstName()
+            + " "
+            + teacher.getLastName());
   }
 
-  public boolean existsByName(String name) {
-    return teacherRepository.existsByFirstName(name);
+  private void isTeacherExists(int id) {
+    if (!teacherRepository.existsById(id)) {
+      throw new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND);
+    }
   }
 
-  public boolean existsById(int id) {
-    return teacherRepository.existsById(id);
+  private void existsByFirstNameAndLastNameIgnoreCaseAndBranch_Id(
+      String firstName, String lastName, int id) {
+    if (teacherRepository.existsByFirstNameAndLastNameIgnoreCaseAndBranch_Id(
+        firstName, lastName, id)) {
+      throw new BusinessException(Messages.ErrorMessages.TEACHER_NAME_DUPLICATED);
+    }
   }
 
-  boolean existsByFirstNameIgnoreCaseAndBranch_Id(String name, int id) {
-    return teacherRepository.existsByFirstNameIgnoreCaseAndBranch_Id(name, id);
+  private static GetAllTeacherResponse buildGetAllTeacherResponseFromTeacher(Teacher inDbTeacher) {
+    return GetAllTeacherResponse.builder()
+        .id(inDbTeacher.getId())
+        .firstName(inDbTeacher.getFirstName())
+        .lastName(inDbTeacher.getLastName())
+        .age(inDbTeacher.getAge())
+        .biography(inDbTeacher.getBiography())
+        .title(inDbTeacher.getTitle())
+        .salary(inDbTeacher.getSalary())
+        .gender(inDbTeacher.getGender())
+        .email(inDbTeacher.getEmail())
+        .userName(inDbTeacher.getUserName())
+        .password(inDbTeacher.getPassword())
+        .branch(inDbTeacher.getBranch())
+        .build();
+  }
+
+  private static GetByIdTeacherResponse buildGetByIdTeacherResponseFromTeacher(
+      Teacher inDbTeacher) {
+    return GetByIdTeacherResponse.builder()
+        .branchName(inDbTeacher.getBranch().getName())
+        .firstName(inDbTeacher.getFirstName())
+        .lastName(inDbTeacher.getLastName())
+        .age(inDbTeacher.getAge())
+        .biography(inDbTeacher.getBiography())
+        .title(inDbTeacher.getTitle())
+        .salary(inDbTeacher.getSalary())
+        .biography(inDbTeacher.getBiography())
+        .build();
+  }
+
+  private static Teacher buildTeacherAddRequestToTeacher(TeacherAddRequest teacherAddRequest) {
+
+    return Teacher.builder()
+        .firstName(teacherAddRequest.getFirstName())
+        .lastName(teacherAddRequest.getLastName())
+        .age(teacherAddRequest.getAge())
+        .biography(teacherAddRequest.getBiography())
+        .title(teacherAddRequest.getTitle())
+        .salary(teacherAddRequest.getSalary())
+        .gender(teacherAddRequest.getGender())
+        .email(teacherAddRequest.getEmail())
+        .userName(teacherAddRequest.getUserName())
+        .password(teacherAddRequest.getPassword())
+        .build();
+  }
+
+  private static Teacher buildTeacherUpdateRequestToTeacher(
+      TeacherUpdateRequest teacherUpdateRequest) {
+    return Teacher.builder()
+        .firstName(teacherUpdateRequest.getFirstName())
+        .lastName(teacherUpdateRequest.getLastName())
+        .age(teacherUpdateRequest.getAge())
+        .biography(teacherUpdateRequest.getBiography())
+        .title(teacherUpdateRequest.getTitle())
+        .salary(teacherUpdateRequest.getSalary())
+        .gender(teacherUpdateRequest.getGender())
+        .email(teacherUpdateRequest.getEmail())
+        .userName(teacherUpdateRequest.getUserName())
+        .password(teacherUpdateRequest.getPassword())
+        .build();
   }
 }

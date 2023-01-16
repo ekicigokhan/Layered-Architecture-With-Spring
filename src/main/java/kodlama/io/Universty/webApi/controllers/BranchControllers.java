@@ -11,15 +11,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/branches")
-public class BranchController {
+public class BranchControllers {
 
   private BranchService branchService;
 
-  public BranchController(BranchService branchService) {
+  public BranchControllers(BranchService branchService) {
     this.branchService = branchService;
   }
 
@@ -38,7 +39,7 @@ public class BranchController {
   }
 
   @PostMapping("/add")
-  public ResponseEntity<Result> add(@RequestBody BranchAddRequest branchAddRequest)
+  public ResponseEntity<Result> add(@Valid@RequestBody BranchAddRequest branchAddRequest)
       throws Exception {
     Result branchServiceAddResult = branchService.add(branchAddRequest);
     return new ResponseEntity<>(branchServiceAddResult, HttpStatus.OK);
@@ -46,7 +47,7 @@ public class BranchController {
 
   @PutMapping("{id}")
   public ResponseEntity<Result> update(
-      @PathVariable int id, @RequestBody BranchUpdateRequest branchUpdateRequest) throws Exception {
+          @PathVariable int id, @Valid @RequestBody BranchUpdateRequest branchUpdateRequest) throws Exception {
     Result branchServiceUpdateResult = branchService.update(id, branchUpdateRequest);
     return new ResponseEntity<>(branchServiceUpdateResult, HttpStatus.OK);
   }

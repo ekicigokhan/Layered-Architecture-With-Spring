@@ -1,19 +1,21 @@
 package kodlama.io.Universty.webApi.model.responses.teacher;
 
 import kodlama.io.Universty.entities.concretes.Teacher;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class GetByIdTeacherResponse {
 
-    private String firstname;
+    private String firstName;
     private String lastName;
     private String branchName;
+    private int age;
+    private String title;
+    private String biography;
+    private double salary;
 
 }

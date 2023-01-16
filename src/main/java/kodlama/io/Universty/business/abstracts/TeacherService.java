@@ -12,12 +12,8 @@ import java.util.List;
 public interface TeacherService {
 
   DataResult<List<GetAllTeacherResponse>> getAll();
-
   DataResult<GetByIdTeacherResponse> getById(int id) throws Exception;
-
   Result add(TeacherAddRequest teacherAddRequest) throws Exception;
-
   Result update(int id, TeacherUpdateRequest teacherUpdateRequest) throws Exception;
-
   Result delete(int id) throws Exception;
 }
