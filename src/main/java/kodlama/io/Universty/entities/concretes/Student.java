@@ -1,11 +1,13 @@
 package kodlama.io.Universty.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import jakarta.persistence.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +32,9 @@ public class Student extends User {
   @ManyToOne
   @JoinColumn(name = "department_id")
   private Department department;
+  @ManyToMany
+  @JsonIgnore
+  private List<Lesson> lessons;
 
   @Builder
   public Student(
@@ -44,12 +49,13 @@ public class Student extends User {
       String nationality,
       String nationalIdentity,
       LocalDate birthday,
-      Department department) {
+      Department department,List<Lesson> lessons) {
     super(id, firstName, lastName, email, userName, password, gender);
     this.studentNo = studentNo;
     this.nationality = nationality;
     this.nationalIdentity = nationalIdentity;
     this.birthday = birthday;
     this.department = department;
+    this.lessons = lessons;
   }
 }

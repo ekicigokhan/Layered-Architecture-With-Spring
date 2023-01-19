@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @NoArgsConstructor
@@ -16,19 +17,19 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "teachers"})
 public class Branch {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "branch_id")
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "branch_id")
+    private int id;
 
-  @Column(name = "branch_name")
-  private String name;
+    @Column(name = "branch_name")
+    private String name;
 
-  @OneToMany(
-      mappedBy = "branch",
-      cascade =
-          CascadeType
-              .ALL) // EAGER : VERİTABANINDAN BRANŞ HER SELECT EDİLDİĞİNİZDE ONUN İLGİLİ TEACHER'IDA
-  // GELSİN.
-  private List<Teacher> teachers;
+    @OneToMany(
+            mappedBy = "branch",
+            cascade =
+                    CascadeType
+                            .ALL) // EAGER : VERİTABANINDAN BRANŞ HER SELECT EDİLDİĞİNİZDE ONUN İLGİLİ TEACHER'IDA
+    // GELSİN.
+    private List<Teacher> teachers;
 }

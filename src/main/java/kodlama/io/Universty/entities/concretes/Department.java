@@ -1,5 +1,6 @@
 package kodlama.io.Universty.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
@@ -21,12 +22,18 @@ public class Department {
   @Column(name = "department_id")
   private int id;
 
-  @Column(name = "name")
+  @Column(name = "department_name")
   private String name;
 
   @Column(name = "description")
   private String description;
 
+  @ManyToOne
+  @JoinColumn(name = "faculty_id")
+  @JsonIgnore
+  private Faculty faculty;
+
   @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
   private List<Student> students;
+
 }

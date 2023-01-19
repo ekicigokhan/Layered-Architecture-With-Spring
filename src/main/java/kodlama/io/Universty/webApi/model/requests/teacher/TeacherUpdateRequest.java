@@ -1,5 +1,6 @@
 package kodlama.io.Universty.webApi.model.requests.teacher;
 
+import kodlama.io.Universty.business.constants.Messages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,12 +43,12 @@ public class TeacherUpdateRequest {
 
     @NotNull
     @NotBlank
-    @Email(message = "E-POSTA GEÇERLİ OLMALIDIR !")
+    @Email(message = Messages.RequestMessages.ADD_VALİD_EMAİL_PLEASE)
     private String email;
 
     @NotNull
     @NotBlank
-    @Size( min = 4,max = 22 ,message = "BU ALAN BOŞ BIRAKILAMAZ !")
+    @Size( min = 4,max = 22 ,message = Messages.ErrorMessages.CANNOT_BE_BLANK)
     private String userName;
 
     @NotNull

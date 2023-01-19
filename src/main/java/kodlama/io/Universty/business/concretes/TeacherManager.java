@@ -10,6 +10,7 @@ import kodlama.io.Universty.core.utilities.results.SuccessDataResult;
 import kodlama.io.Universty.core.utilities.results.SuccessResult;
 import kodlama.io.Universty.dataAccess.abstracts.TeacherRepository;
 import kodlama.io.Universty.entities.concretes.Branch;
+import kodlama.io.Universty.entities.concretes.Student;
 import kodlama.io.Universty.entities.concretes.Teacher;
 import kodlama.io.Universty.webApi.model.requests.teacher.TeacherAddRequest;
 import kodlama.io.Universty.webApi.model.requests.teacher.TeacherUpdateRequest;
@@ -67,6 +68,7 @@ public class TeacherManager implements TeacherService {
   public Result add(TeacherAddRequest teacherAddRequest) throws Exception {
 
     branchService.isBranchExists(teacherAddRequest.getBranchId());
+    isEmailExists(teacherAddRequest.getEmail());
     existsByFirstNameAndLastNameIgnoreCaseAndBranch_Id(
         teacherAddRequest.getFirstName(),
         teacherAddRequest.getLastName(),
@@ -101,8 +103,7 @@ public class TeacherManager implements TeacherService {
   @Override
   public Result delete(int id) throws Exception {
 
-    isTeacherExists(id);
-    Teacher teacher = teacherRepository.findById(id).get();
+    Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new BusinessException(Messages.ErrorMessages.ID_NOT_FOUND));
     teacherRepository.deleteById(id);
     return new SuccessResult(
         Messages.DeleteMessages.TEACHER_DELETED
@@ -110,6 +111,13 @@ public class TeacherManager implements TeacherService {
             + teacher.getFirstName()
             + " "
             + teacher.getLastName());
+  }
+
+  private void isEmailExists(String email) {
+    for (Teacher inDbTeacher : teacherRepository.findAll())
+      if (inDbTeacher.getEmail().equalsIgnoreCase(email)) {
+        throw new BusinessException(Messages.ErrorMessages.MAİL_DUPLICATED);
+      }
   }
 
   private void isTeacherExists(int id) {

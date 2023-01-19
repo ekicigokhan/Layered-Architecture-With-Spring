@@ -6,17 +6,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 
 @EnableWebSecurity
-@Configuration
 public class SecurityConfigration extends WebSecurityConfiguration {
 
   public SecurityConfigration(HttpSecurity httpSecurity) throws Exception {
+
+    httpSecurity.httpBasic();
+
     httpSecurity
         .authorizeHttpRequests()
-        .requestMatchers("api/v1/students/add")
+        .requestMatchers("/api/v1/students/add")
         .authenticated()
         .and()
         .authorizeHttpRequests()
-        .requestMatchers("api/v1/students/getall")
+        .requestMatchers("/api/v1/students/getall")
         .permitAll();
   }
 }

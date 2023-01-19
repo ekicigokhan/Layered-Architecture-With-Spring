@@ -1,5 +1,8 @@
 package kodlama.io.Universty.webApi.model.requests.student;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import kodlama.io.Universty.business.constants.Messages;
+import kodlama.io.Universty.entities.concretes.Lesson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,12 +56,12 @@ public class StudentAddRequest {
 
     @NotNull
     @NotBlank
-    @Email(message = "E-POSTA GEÇERLİ OLMALIDIR !")
+    @Email(message = Messages.RequestMessages.ADD_VALİD_EMAİL_PLEASE)
     private String email;
 
     @NotNull
     @NotBlank
-    @Size( min = 4,max = 22 ,message = "BU ALAN BOŞ BIRAKILAMAZ !")
+    @Size( min = 4,max = 22 ,message = Messages.ErrorMessages.CANNOT_BE_BLANK)
     private String userName;
 
     @NotNull
@@ -65,4 +69,6 @@ public class StudentAddRequest {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{8,15}$")
     @Size(min = 4, max = 12)
     private String password;
+
+    private List<Lesson> lessons;
 }

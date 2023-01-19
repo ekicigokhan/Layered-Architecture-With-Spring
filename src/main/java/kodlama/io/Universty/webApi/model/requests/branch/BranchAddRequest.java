@@ -1,11 +1,13 @@
 package kodlama.io.Universty.webApi.model.requests.branch;
 
+import kodlama.io.Universty.business.constants.Messages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import jakarta.validation.constraints.*;
+import org.springframework.context.MessageSource;
 
 
 @AllArgsConstructor
@@ -14,6 +16,6 @@ import jakarta.validation.constraints.*;
 @Setter
 public class BranchAddRequest {
 
-    @NotBlank(message = "LÜTFEN BİR BRANŞ ADI GİRİNİZ !")
+    @NotBlank(message = Messages.RequestMessages.ADD_DATA_PLEASE)
     private String name;
 }

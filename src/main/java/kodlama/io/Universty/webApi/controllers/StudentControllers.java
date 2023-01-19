@@ -28,8 +28,8 @@ public class StudentControllers {
     return new ResponseEntity<>(studentService.getAll(), HttpStatus.OK);
   }
 
-  @GetMapping("/getbyid")
-  public ResponseEntity<DataResult<GetByIdStudentResponse>> getById(@RequestParam int id)
+  @GetMapping("/{id}")
+  public ResponseEntity<DataResult<GetByIdStudentResponse>> getById(@PathVariable int id)
       throws Exception {
     return new ResponseEntity<>(studentService.getById(id), HttpStatus.OK);
   }
@@ -42,13 +42,13 @@ public class StudentControllers {
 
   @PutMapping("/{id}")
   public ResponseEntity<Result> update(
-      @RequestParam int id, @RequestBody StudentUpdateRequest studentUpdateRequest)
+      @PathVariable int id, @RequestBody StudentUpdateRequest studentUpdateRequest)
       throws Exception {
     return new ResponseEntity<>(studentService.update(id, studentUpdateRequest), HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Result> delete(int id) throws Exception {
+  public ResponseEntity<Result> delete(@PathVariable int id) throws Exception {
     return new ResponseEntity<>(studentService.delete(id), HttpStatus.OK);
   }
 }

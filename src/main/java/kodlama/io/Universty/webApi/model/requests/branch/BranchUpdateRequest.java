@@ -14,7 +14,6 @@ import jakarta.validation.constraints.*;
 @Setter
 public class BranchUpdateRequest {
 
-
     @NotNull
     @NotBlank
     private String name;

@@ -14,41 +14,33 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @PrimaryKeyJoinColumn(name = "teacher_id", referencedColumnName = "user_id")
 public class Teacher extends User {
-  @Column(name = "age")
-  private int age;
+    @Column(name = "age")
+    private int age;
 
-  @Column(name = "salary")
-  private double salary;
+    @Column(name = "salary")
+    private double salary;
 
-  @Column(name = "biography")
-  private String biography;
+    @Column(name = "biography")
+    private String biography;
 
-  @Column(name = "title")
-  private String title;
+    @Column(name = "title")
+    private String title;
 
-  @ManyToOne()
-  @JoinColumn(name = "branch_id")
-  private Branch branch;
+    @ManyToOne()
+    @JoinColumn(name = "branch_id")
+    private Branch branch;
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
+    private Lesson lesson;
 
-  @Builder
-  public Teacher(
-      int id,
-      String firstName,
-      String lastName,
-      String email,
-      String userName,
-      String password,
-      String gender,
-      int age,
-      double salary,
-      String biography,
-      String title,
-      Branch branch) {
-    super(id, firstName, lastName, email, userName, password, gender);
-    this.age = age;
-    this.salary = salary;
-    this.biography = biography;
-    this.title = title;
-    this.branch = branch;
-  }
+    @Builder
+    public Teacher(int id, String firstName, String lastName, String email, String userName, String password, String gender, int age, double salary, String biography, String title, Branch branch, Lesson lesson) {
+        super(id, firstName, lastName, email, userName, password, gender);
+        this.age = age;
+        this.salary = salary;
+        this.biography = biography;
+        this.title = title;
+        this.branch = branch;
+        this.lesson = lesson;
+    }
 }

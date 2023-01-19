@@ -1,6 +1,7 @@
 package kodlama.io.Universty.business.concretes;
 
 import kodlama.io.Universty.business.abstracts.DepartmentService;
+import kodlama.io.Universty.business.abstracts.FacultyService;
 import kodlama.io.Universty.business.constants.Messages;
 import kodlama.io.Universty.core.utilities.customExceptions.BusinessException;
 import kodlama.io.Universty.core.utilities.results.DataResult;
@@ -9,6 +10,7 @@ import kodlama.io.Universty.core.utilities.results.SuccessDataResult;
 import kodlama.io.Universty.core.utilities.results.SuccessResult;
 import kodlama.io.Universty.dataAccess.abstracts.DepartmentRepository;
 import kodlama.io.Universty.entities.concretes.Department;
+import kodlama.io.Universty.entities.concretes.Faculty;
 import kodlama.io.Universty.webApi.model.requests.department.DepartmentAddRequest;
 import kodlama.io.Universty.webApi.model.requests.department.DepartmentUpdateRequest;
 import kodlama.io.Universty.webApi.model.responses.department.GetAllDepartmentResponse;
@@ -22,9 +24,11 @@ import java.util.List;
 public class DepartmentManager implements DepartmentService {
 
   private DepartmentRepository departmentRepository;
+  private FacultyService facultyService;
 
-  public DepartmentManager(DepartmentRepository departmentRepository) {
+  public DepartmentManager(DepartmentRepository departmentRepository,FacultyService facultyService) {
     this.departmentRepository = departmentRepository;
+    this.facultyService = facultyService;
   }
 
   @Override
@@ -58,7 +62,9 @@ public class DepartmentManager implements DepartmentService {
   public Result add(DepartmentAddRequest departmentAddRequest) throws Exception {
 
     existsByDepartmentName(departmentAddRequest.getName());
+    Faculty faculty = facultyService.getFacultyById(departmentAddRequest.getFacultyId());
     Department department = buildDepartmentAddRequestToDepartment(departmentAddRequest);
+    department.setFaculty(faculty);
     departmentRepository.save(department);
     return new SuccessResult(
         Messages.AddMessages.DEPARTMENT_ADDED + " " + departmentAddRequest.getName());

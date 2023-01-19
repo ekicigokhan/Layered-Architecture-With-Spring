@@ -28,8 +28,8 @@ public class DepartmentControllers {
         return new ResponseEntity<>(departmentServiceGetAllResult, HttpStatus.OK);
     }
 
-    @GetMapping("/getbyid")
-    public ResponseEntity<DataResult> getById(@RequestParam int id) throws Exception {
+    @GetMapping("/{id}")
+    public ResponseEntity<DataResult> getById(@PathVariable int id) throws Exception {
 
         DataResult departmentServiceGetByıdResult = departmentService.getById(id);
         return new ResponseEntity<>(departmentServiceGetByıdResult,HttpStatus.OK);
@@ -43,20 +43,17 @@ public class DepartmentControllers {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Result> update(@RequestParam int id, @Valid @RequestBody DepartmentUpdateRequest departmentUpdateRequest) throws Exception {
+    public ResponseEntity<Result> update(@PathVariable int id, @Valid @RequestBody DepartmentUpdateRequest departmentUpdateRequest) throws Exception {
 
         Result departmentServiceUpdateResult =  departmentService.update(id,departmentUpdateRequest);
         return new ResponseEntity<>(departmentServiceUpdateResult,HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Result> delete(@RequestParam int id) throws Exception {
+    public ResponseEntity<Result> delete(@PathVariable int id) throws Exception {
 
         Result departmentServiceDeleteResult =  departmentService.delete(id);
         return new ResponseEntity<>(departmentServiceDeleteResult,HttpStatus.OK);
     }
-
-
-
 
 }

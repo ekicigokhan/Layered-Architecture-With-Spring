@@ -1,9 +1,11 @@
 package kodlama.io.Universty.webApi.model.responses.student;
 
 import kodlama.io.Universty.entities.concretes.Department;
+import kodlama.io.Universty.entities.concretes.Lesson;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,4 +26,5 @@ public class GetAllStudentResponse {
   private String userName;
   private String password;
   private Department department;
+  private List<Lesson> lessons;
 }
